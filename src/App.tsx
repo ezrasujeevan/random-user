@@ -24,12 +24,13 @@ function App() {
     const [users, setUsers] = useState<User[]>([]);
     const [sortType, setSortType] = useState<string>("first");
     const [edit, setEdit] = useState<number>(-1)
-
+    const [searchUser, setSearchUser] = useState<User[]>(users);
 
     useEffect(() => {
         const fetchUsers = async () => {
             const response = await axios.get("https://randomuser.me/api/?results=12&nat=us");
             setUsers(response.data.results);
+            setSearchUser(response.data.results);
         };
         fetchUsers();
     }, []);
@@ -49,7 +50,7 @@ function App() {
     const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
         const searchTerm = event.target.value;
         const search = users.filter((user) => user.name.first.toLowerCase().includes(searchTerm.toLowerCase()) || user.name.last.toLowerCase().includes(searchTerm.toLowerCase()));
-        setUsers(search)
+        setSearchUser(search)
     };
     //
     // const handleSort = (field: string) => {
@@ -74,17 +75,12 @@ function App() {
     const handleEditUserName = (node: string, value: string) => {
         updateEditUser(draft => {
             draft.name[node as keyof Name] = value
-
         })
-
-
     }
     const handleEditUserLocation = (node: string, value: string) => {
-
         updateEditUser(draft => {
             draft.location[node as keyof Location] = value
         })
-
     }
 
 
@@ -113,7 +109,7 @@ function App() {
                 </FormControl>
             </Grid>
             <Grid spacing={2} sm={12} container>
-                {users.map((user, index) => {
+                {searchUser.map((user, index) => {
                     if (edit === index) {
                         return (<Grid sm={4} display="flex" justifyContent="center" key={index}>
                             <Grid direction={"column"}>
@@ -161,12 +157,14 @@ function App() {
                         return (<Grid sm={4} display="flex" justifyContent="center" key={index}>
                             <Card variant="outlined">
                                 <CardContent>
+                                    <div>
                                     <IconButton aria-label="edit" onClick={() => handleEdit(index)}>
                                         <EditNote/>
                                     </IconButton>
                                     <Typography variant="h5">
                                         {user.name.title}.{user.name.first} {user.name.last}
                                     </Typography>
+                                    </div>
                                     <Avatar alt={user.name.first} src={user.picture.large}
                                             sx={{width: 100, height: 100}}/>
                                     <Typography variant="h6" alignItems="center" component={"div"}>
