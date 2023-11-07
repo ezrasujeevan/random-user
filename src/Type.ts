@@ -20,4 +20,6 @@ export type Location = {
     country: string;
 }
 
+
+
 export type Target = Location | Name
